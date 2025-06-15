@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 
-const BACKEND_URL = 'https://your-backend.onrender.com'; // ← Replace this!
+const BACKEND_URL = 'https://web-scraper-dashboard-three.vercel.app/'; // ← Replace this!
 
 function App() {
   const [data, setData] = useState([]);
