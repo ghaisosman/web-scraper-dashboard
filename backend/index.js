@@ -3,7 +3,7 @@ import cors from 'cors';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import cron from 'node-cron';
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-core';
 
 const app = express();
 app.use(cors());
