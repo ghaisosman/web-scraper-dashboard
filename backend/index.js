@@ -7,15 +7,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Test route
 app.get('/', (req, res) => {
   res.send('Backend is running!');
 });
 
-// New scraping route
 app.get('/scrape', async (req, res) => {
   try {
-    const response = await axios.get('https://example.com'); // Replace with real URL
+    const response = await axios.get('https://quotes.toscrape.com/');
     const $ = cheerio.load(response.data);
 
     const titles = [];
@@ -24,13 +22,12 @@ app.get('/scrape', async (req, res) => {
       if (title) titles.push(title);
     });
 
-    res.json({ results: titles.slice(0, 10) }); // limit to 10 results
+    res.json({ results: titles.slice(0, 10) });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Render's dynamic port
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
