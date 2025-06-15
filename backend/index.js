@@ -55,16 +55,13 @@ app.get('/scrape-dxb', async (req, res) => {
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     const page = await browser.newPage();
-
     console.log('✅ Puppeteer started, opening DXBInteract...');
-
     await page.goto('https://dxbinteract.com', {
       waitUntil: 'domcontentloaded',
       timeout: 30000
     });
-
-    await page.waitForSelector('.compare-row');
-    await page.waitForSelector('.stat-value');
+    await page.waitForSelector('.compare-row', { timeout: 10000 });
+    await page.waitForSelector('.stat-value', { timeout: 10000 });
 
     const results = await page.evaluate(() => {
       const format = txt => txt?.replace(/\s+/g, ' ').trim();
@@ -83,9 +80,3 @@ app.get('/scrape-dxb', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
-
