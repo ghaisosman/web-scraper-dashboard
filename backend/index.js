@@ -51,16 +51,16 @@ cron.schedule('0 4 * * *', async () => {
 app.get('/scrape-dxb', async (req, res) => {
   try {
     const browser = await puppeteer.launch({
-  headless: 'new',
-  executablePath: '/usr/bin/chromium-browser',
-  args: ['--no-sandbox', '--disable-setuid-sandbox']
+      headless: 'new',
+      executablePath: '/usr/bin/chromium-browser',
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     const page = await browser.newPage();
-    console.log('✅ Puppeteer started, opening DXBInteract...');
     await page.goto('https://dxbinteract.com', {
       waitUntil: 'domcontentloaded',
       timeout: 30000
     });
+
     await page.waitForSelector('.compare-row', { timeout: 10000 });
     await page.waitForSelector('.stat-value', { timeout: 10000 });
 
@@ -73,11 +73,10 @@ app.get('/scrape-dxb', async (req, res) => {
       return { salesVolume, transactionCount, compareText };
     });
 
-    console.log('✅ Scraping complete, closing browser.');
     await browser.close();
     res.json({ results });
   } catch (err) {
-    console.error('❌ Error during scrape:', err.message);
+    console.error('❌ Scrape failed:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
