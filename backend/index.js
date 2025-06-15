@@ -51,8 +51,9 @@ cron.schedule('0 4 * * *', async () => {
 app.get('/scrape-dxb', async (req, res) => {
   try {
     const browser = await puppeteer.launch({
-      headless: 'new',
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+  headless: 'new',
+  executablePath: '/usr/bin/chromium-browser',
+  args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     const page = await browser.newPage();
     console.log('✅ Puppeteer started, opening DXBInteract...');
