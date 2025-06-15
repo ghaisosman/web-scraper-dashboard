@@ -49,11 +49,11 @@ cron.schedule('0 4 * * *', async () => {
 
 // ✅ New Route: Scrape DXBInteract homepage
 app.get('/scrape-dxb', async (req, res) => {
-  try {
-    const browser = await puppeteer.launch({
-      headless: 'new',
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
+  try {const browser = await puppeteer.launch({
+  headless: 'new',
+  args: ['--no-sandbox', '--disable-setuid-sandbox']
+});
+
     const page = await browser.newPage();
     await page.goto('https://dxbinteract.com', { waitUntil: 'networkidle2' });
 
