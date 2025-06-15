@@ -3,18 +3,18 @@ import cors from 'cors';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import cron from 'node-cron';
-import puppeteer from 'puppeteer'; // ✅ Added Puppeteer
+import puppeteer from 'puppeteer';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✅ Root check
+// Root check
 app.get('/', (req, res) => {
   res.send('Backend is running!');
 });
 
-// ✅ Quote scraper (for testing)
+// Quotes test route
 app.get('/scrape', async (req, res) => {
   try {
     const response = await axios.get('https://quotes.toscrape.com/');
@@ -30,7 +30,7 @@ app.get('/scrape', async (req, res) => {
   }
 });
 
-// ✅ Daily job 8am Dubai (4am UTC)
+// Cron job – 8AM Dubai = 4AM UTC
 cron.schedule('0 4 * * *', async () => {
   console.log('⏰ Running scheduled scrape at 8AM Dubai');
   try {
@@ -47,41 +47,39 @@ cron.schedule('0 4 * * *', async () => {
   }
 });
 
-// ✅ New Route: Scrape DXBInteract homepage
+// Scraper for dxbinteract.com
 app.get('/scrape-dxb', async (req, res) => {
-  try {const browser = await puppeteer.launch({
-  headless: 'new',
-  args: ['--no-sandbox', '--disable-setuid-sandbox']
-});
-
+  try {
+    const browser = await puppeteer.launch({
+      headless: 'new',
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
     const page = await browser.newPage();
-    await page.goto('https://dxbinteract.com', { waitUntil: 'networkidle2' });
 
-    // Wait for key elements to appear
-    await page.waitForSelector('.compare-row'); // Year-to-Year comparison
-    await page.waitForSelector('.stat-value');  // Total sales
+    console.log('✅ Puppeteer started, opening DXBInteract...');
 
-    // Extract sales & comparison data
+    await page.goto('https://dxbinteract.com', {
+      waitUntil: 'domcontentloaded',
+      timeout: 30000
+    });
+
+    await page.waitForSelector('.compare-row');
+    await page.waitForSelector('.stat-value');
+
     const results = await page.evaluate(() => {
       const format = txt => txt?.replace(/\s+/g, ' ').trim();
-
       const statBoxes = document.querySelectorAll('.stat-value');
       const salesVolume = format(statBoxes?.[0]?.textContent);
       const transactionCount = format(statBoxes?.[1]?.textContent);
-
       const compareText = format(document.querySelector('.compare-row')?.textContent);
-
-      return {
-        salesVolume,
-        transactionCount,
-        compareText
-      };
+      return { salesVolume, transactionCount, compareText };
     });
 
+    console.log('✅ Scraping complete, closing browser.');
     await browser.close();
     res.json({ results });
   } catch (err) {
-    console.error(err);
+    console.error('❌ Error during scrape:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
@@ -90,3 +88,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
